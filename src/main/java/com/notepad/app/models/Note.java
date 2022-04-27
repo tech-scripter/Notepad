@@ -2,6 +2,7 @@ package com.notepad.app.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "notes")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Note {
 
     @Id
@@ -34,10 +36,6 @@ public class Note {
     @JoinColumn(nullable = false,
                 name = "user_id")
     private User user;
-
-    public Note() {
-
-    }
 
     public Note(String title, String content, LocalDateTime createdAt, User user) {
         this.title = title;
