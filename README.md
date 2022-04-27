@@ -2,7 +2,7 @@
 
 Инструкция по запуску:
 
-Скачайте и установите PostgresSql, если ее нет на вашем ПК
+Скачайте и установите PostgresSql
 
 Чтобы запустить серверную чаcть веб приложения в файле applications.properties (src/main/resources) нужно поменять значения следующих параметров:
 1. spring.datasource.url=jdbc:postgresql://localhost:5432/НАЗВАНИЕ_ВАШЕЙ_БАЗЫ_ДАННЫХ  (рекомендуется назвать ее `notepad`)
