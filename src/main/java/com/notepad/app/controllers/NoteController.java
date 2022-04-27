@@ -20,12 +20,6 @@ public class NoteController {
         this.noteService = noteService;
     }
 
-    @GetMapping()
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> displayNotes() {
-        return noteService.display();
-    }
-
     @PostMapping()
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<?> createNote(@RequestBody Note note) {

@@ -29,18 +29,6 @@ public class NoteService {
         this.noteRepository = noteRepository;
     }
 
-    public ResponseEntity<?> display() {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            List<Note> userNotes = noteRepository.findAll();
-            return new ResponseEntity<>(userNotes, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
-    }
-
     public ResponseEntity<?> create(Note note) {
         Optional<User> user = getCurrentUser();
 
