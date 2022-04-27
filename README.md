@@ -10,10 +10,10 @@ b. spring.datasource.username=ВАШ_ЛОГИН
 c. spring.datasource.password=ВАШ_ПАРОЛЬ
 
 3. Запустить сервер бэкенда:
-A) cd путь_к_папке_проекта
-B) mvn package
-C) cd target
-D) java -jar app-0.0.1-SNAPSHOT.jar
+a. cd путь_к_папке_проекта
+b. mvn package
+c. cd target
+d. java -jar app-0.0.1-SNAPSHOT.jar
 
 4. Запустить сервер фронтенда: 
-A) npm run serve
+a. npm run serve
