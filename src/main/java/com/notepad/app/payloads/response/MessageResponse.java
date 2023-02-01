@@ -1,4 +1,4 @@
-package com.notepad.app.payloads;
+package com.notepad.app.payloads.response;
 
 public class MessageResponse {
     private String message;

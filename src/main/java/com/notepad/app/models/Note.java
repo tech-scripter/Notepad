@@ -1,46 +1,40 @@
 package com.notepad.app.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
-@Table(name = "notes")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "NOTES")
 public class Note {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "ID_GENERATOR")
     private Long id;
 
-    @Column(name = "title",
+    @Column(name = "TITLE",
             nullable = false)
     private String title;
 
-    @Column(name = "content",
-            nullable = false)
+    @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "created_at",
-            nullable = false)
-    @JsonIgnore
+    @Column(name = "CREATED_AT",
+            insertable = false,
+            updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(nullable = false,
-                name = "user_id")
-    private User user;
-
-    public Note(String title, String content, LocalDateTime createdAt, User user) {
-        this.title = title;
-        this.content = content;
-        this.createdAt = createdAt;
-        this.user = user;
-    }
+    @org.hibernate.annotations.Generated(GenerationTime.ALWAYS)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "LAST_MODIFIED",
+            insertable = false,
+            updatable = false)
+    private Date lastModified;
 }

@@ -1,46 +1,34 @@
 package com.notepad.app.controllers;
 
-import com.notepad.app.payloads.ModifiedNote;
-import com.notepad.app.services.NoteService;
-import com.notepad.app.models.Note;
+import com.notepad.app.payloads.request.NoteRequest;
+import com.notepad.app.payloads.response.NoteResponse;
+import com.notepad.app.services.NotepadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
-@RestController
-@RequestMapping("/api/editor")
-public class NoteController {
+import java.util.List;
 
-    private final NoteService noteService;
+@RestController
+@RequestMapping("/api/notepad")
+@CrossOrigin(origins = "http://localhost:8080", maxAge = 3600)
+public class NoteController {
+    private final NotepadService notepadService;
 
     @Autowired
-    public NoteController(NoteService noteService) {
-        this.noteService = noteService;
+    public NoteController(NotepadService notepadService) {
+        this.notepadService = notepadService;
     }
 
-    @PostMapping()
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> createNote(@RequestBody Note note) {
-        return noteService.create(note);
+    @PostMapping("/notes")
+    public ResponseEntity<List<NoteResponse>> createNote(@RequestBody NoteRequest noteRequest) {
+        return notepadService.processNoteSaving(noteRequest);
     }
 
-    @DeleteMapping("/{title}")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> deleteNote(@PathVariable String title) {
-        return noteService.delete(title);
+    @PutMapping("/notes/{id}")
+    public ResponseEntity<?> updateNote(@PathVariable Long id,
+                                        @RequestBody NoteRequest noteRequest) {
+        return notepadService.processNoteUpdating(id, noteRequest);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> updateNote(@PathVariable String id, @RequestBody ModifiedNote note) {
-        return noteService.update(id, note);
-    }
-
-    @GetMapping("/notes/{userId}")
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> displayAllNotesByUserId(@PathVariable String userId) {
-        return noteService.displayAllNotesById(userId);
-    }
 }

@@ -1,92 +1,58 @@
 package com.notepad.app.services;
 
-import com.notepad.app.payloads.ModifiedNote;
+import com.notepad.app.exceptions.NoteNotFoundException;
 import com.notepad.app.models.Note;
-import com.notepad.app.models.User;
 import com.notepad.app.repositories.NoteRepository;
-import com.notepad.app.repositories.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class NoteService {
-
-    private final UserRepository userRepository;
+    private final ModelMapper mapper;
     private final NoteRepository noteRepository;
 
     @Autowired
-    public NoteService(UserRepository userRepository,
+    public NoteService(ModelMapper mapper,
                        NoteRepository noteRepository) {
-        this.userRepository = userRepository;
+        this.mapper = mapper;
         this.noteRepository = noteRepository;
     }
 
-    public ResponseEntity<?> create(Note note) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            noteRepository.save(new Note(note.getTitle(),
-                    note.getContent(),
-                    LocalDateTime.now(),
-                    user.get()));
-            return new ResponseEntity<>("Заметка создана!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public Note saveNote(Note note) {
+        return noteRepository.save(note);
     }
 
-    public ResponseEntity<?> delete(String title) {
-        Optional<User> user = getCurrentUser();
+//    public List<Note> findAllNotesByTextContainingInTitleOrContent(String text) {
+//        return noteRepository.findAllByTextContainingInTitleOrContent(text);
+//    }
 
-        if (user.isPresent()) {
-            noteRepository.deleteByTitle(title);
-            return new ResponseEntity<>("Заметка удалена!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public Note findNoteById(Long id) {
+        String message = String.format("Note with id %d not found", id);
+        return noteRepository
+                .findById(id)
+                .orElseThrow(() -> new NoteNotFoundException(message));
     }
 
-    public ResponseEntity<?> update(String id, ModifiedNote modifiedNote) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            noteRepository.updateNoteById(Long.parseLong(id),
-                    modifiedNote.getTitle(),
-                    modifiedNote.getContent(),
-                    LocalDateTime.now(),
-                    user.get());
-            return new ResponseEntity<>("Заметка изменена!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public List<Note> findAllNotes() {
+        return noteRepository.findAll();
     }
 
-    public ResponseEntity<?> displayAllNotesById(String id) {
-        Optional<User> user = getCurrentUser();
+//    public Note findNoteByIdAndUser(Long id, User user) {
+//        String msg = String.format("Note with id %d and user id %d not found",
+//                id, user.getId());
+//        return noteRepository
+//                .findByIdAndUser(id, user)
+//                .orElseThrow(() -> new NoteNotFoundException(msg));
+//    }
 
-        if (user.isPresent()) {
-            List<Note> userNotesById = noteRepository.findAllNotesByUserId(Long.parseLong(id));
-            return new ResponseEntity<>(userNotesById, HttpStatus.OK);
-        }
+//    public List<Note> findAllNotesByUser(User user) {
+//        return noteRepository.findAllByUser(user);
+//    }
 
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
-    }
-
-    private Optional<User> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String name = authentication.getName();
-        return userRepository.findByUsername(name);
+    public void deleteNoteById(Long id) {
+        noteRepository.deleteById(id);
     }
 }
