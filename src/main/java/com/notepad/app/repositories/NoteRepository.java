@@ -9,9 +9,7 @@ import java.util.List;
 
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
-//    @Query(value = "select Note from Note n where n.title like ?1 or n.content like ?1")
-//    List<Note> findAllByTextContainingInTitleOrContent(String text);
-
-//    Optional<Note> findByIdAndUser(Long id, User user);
-//    List<Note> findAllByUser(User user);
+    @Query("select n from Note n " +
+            "where upper(n.title) like upper(concat('%', ?1, '%')) or upper(n.content) like upper(concat('%', ?1, '%'))")
+    List<Note> findAllByTextInTitleOrContent(String text);
 }

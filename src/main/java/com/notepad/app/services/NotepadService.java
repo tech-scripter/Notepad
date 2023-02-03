@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,29 +26,51 @@ public class NotepadService {
         this.noteService = noteService;
     }
 
+    @Transactional
     public ResponseEntity<List<NoteResponse>> processNoteSaving(NoteRequest noteRequest) {
         log.debug("Object from client {}", noteRequest);
         Note note = mapper.map(noteRequest, Note.class);
-        note.setCreatedAt(LocalDateTime.now());
         noteService.saveNote(note);
-        List<NoteResponse> notes = getAllNoteResponse();
+        List<NoteResponse> notes =
+                mapToListOfNoteResponse(noteService.findAllNotes());
         return new ResponseEntity<>(notes, HttpStatus.OK);
     }
 
+    @Transactional
     public ResponseEntity<?> processNoteUpdating(Long id, NoteRequest noteRequest) {
         Note note = noteService.findNoteById(id);
         note.setTitle(noteRequest.getTitle());
         note.setContent(noteRequest.getContent());
         noteService.saveNote(note);
-        List<NoteResponse> noteResponses = getAllNoteResponse();
+        List<NoteResponse> noteResponses =
+                mapToListOfNoteResponse(noteService.findAllNotes());
         return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 
-    private List<NoteResponse> getAllNoteResponse() {
-        return noteService
-                .findAllNotes()
+    @Transactional
+    public ResponseEntity<?> processNoteDeletion(Long id) {
+        noteService.deleteNoteById(id);
+        List<NoteResponse> noteResponses =
+                mapToListOfNoteResponse(noteService.findAllNotes());
+        return new ResponseEntity<>(noteResponses, HttpStatus.NO_CONTENT);
+    }
+
+    public ResponseEntity<List<NoteResponse>> processNotesReceiving() {
+        List<NoteResponse> noteResponses =
+                mapToListOfNoteResponse(noteService.findAllNotes());
+        return new ResponseEntity<>(noteResponses, HttpStatus.OK);
+    }
+
+    public ResponseEntity<List<NoteResponse>> processNotesReceiving(String text) {
+        List<NoteResponse> noteResponses =
+                mapToListOfNoteResponse(noteService.findAllNotesByText(text));
+        return new ResponseEntity<>(noteResponses, HttpStatus.OK);
+    }
+
+    private List<NoteResponse> mapToListOfNoteResponse(List<Note> notes) {
+        return notes
                 .stream()
-                .map(e -> mapper.map(e, NoteResponse.class))
+                .map(note -> mapper.map(note, NoteResponse.class))
                 .collect(Collectors.toList());
     }
 }

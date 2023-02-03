@@ -1,10 +1,10 @@
 package com.notepad.app.models;
 
 import lombok.*;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -27,14 +27,12 @@ public class Note {
     private String content;
 
     @Column(name = "CREATED_AT",
-            insertable = false,
             updatable = false)
-    private LocalDateTime createdAt;
+    @CreationTimestamp
+    private Date createdAt;
 
-    @org.hibernate.annotations.Generated(GenerationTime.ALWAYS)
+    @Column(name = "LAST_MODIFIED", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "LAST_MODIFIED",
-            insertable = false,
-            updatable = false)
+    @UpdateTimestamp
     private Date lastModified;
 }

@@ -20,6 +20,16 @@ public class NoteController {
         this.notepadService = notepadService;
     }
 
+    @GetMapping("/notes")
+    public ResponseEntity<?> getAllNotes() {
+        return notepadService.processNotesReceiving();
+    }
+
+    @GetMapping("/notes")
+    public ResponseEntity<?> getAllNotesByText(@RequestParam String text) {
+        return notepadService.processNotesReceiving(text);
+    }
+
     @PostMapping("/notes")
     public ResponseEntity<List<NoteResponse>> createNote(@RequestBody NoteRequest noteRequest) {
         return notepadService.processNoteSaving(noteRequest);
@@ -29,6 +39,11 @@ public class NoteController {
     public ResponseEntity<?> updateNote(@PathVariable Long id,
                                         @RequestBody NoteRequest noteRequest) {
         return notepadService.processNoteUpdating(id, noteRequest);
+    }
+
+    @DeleteMapping("/notes/{id}")
+    public ResponseEntity<?> deleteNote(@PathVariable Long id) {
+        return notepadService.processNoteDeletion(id);
     }
 
 }
