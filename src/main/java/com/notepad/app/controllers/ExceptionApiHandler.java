@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
+
 @Slf4j
 @RestControllerAdvice
 public class ExceptionApiHandler {
@@ -17,6 +19,14 @@ public class ExceptionApiHandler {
         log.info("{} handled", e.getClass().getName());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessage(e.getMessage(), e.getCause()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorMessage> handleMessage(ConstraintViolationException e) {
+        log.info("{} handled", e.getClass().getName());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorMessage(e.getMessage(), e.getCause()));
     }
 }

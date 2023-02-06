@@ -28,42 +28,45 @@ public class NotepadService {
 
     @Transactional
     public ResponseEntity<List<NoteResponse>> processNoteSaving(NoteRequest noteRequest) {
-        log.debug("Object from client {}", noteRequest);
         Note note = mapper.map(noteRequest, Note.class);
+        log.debug("({}) has been mapped to the ({})", noteRequest, note);
         noteService.saveNote(note);
+        log.debug("({}) is being saved", note);
         List<NoteResponse> notes =
                 mapToListOfNoteResponse(noteService.findAllNotes());
+        log.debug("A list of note responses has been found");
         return new ResponseEntity<>(notes, HttpStatus.OK);
     }
 
     @Transactional
     public ResponseEntity<?> processNoteUpdating(Long id, NoteRequest noteRequest) {
         Note note = noteService.findNoteById(id);
+        log.debug("A note with id ({}) has been found", id);
         note.setTitle(noteRequest.getTitle());
         note.setContent(noteRequest.getContent());
+        log.debug("Note fields have been updated");
         noteService.saveNote(note);
+        log.debug("({}) has been saved", note);
         List<NoteResponse> noteResponses =
                 mapToListOfNoteResponse(noteService.findAllNotes());
+        log.debug("A list of note responses has been found");
         return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 
     @Transactional
     public ResponseEntity<?> processNoteDeletion(Long id) {
         noteService.deleteNoteById(id);
+        log.debug("Note with id ({}) has been deleted", id);
         List<NoteResponse> noteResponses =
                 mapToListOfNoteResponse(noteService.findAllNotes());
+        log.debug("A list of note responses has been found");
         return new ResponseEntity<>(noteResponses, HttpStatus.NO_CONTENT);
-    }
-
-    public ResponseEntity<List<NoteResponse>> processNotesReceiving() {
-        List<NoteResponse> noteResponses =
-                mapToListOfNoteResponse(noteService.findAllNotes());
-        return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 
     public ResponseEntity<List<NoteResponse>> processNotesReceiving(String text) {
         List<NoteResponse> noteResponses =
                 mapToListOfNoteResponse(noteService.findAllNotesByText(text));
+        log.debug("A list of note responses has been found");
         return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 
