@@ -1,28 +1,41 @@
 package com.notepad.app.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Collection;
+import java.util.Collections;
 
+@Getter
+@Setter
+@Entity
+@Table(name = "USERS")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails, Serializable {
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue(generator = "ID_GENERATOR")
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    public Long getId() {
-        return id;
+        return Collections.singleton(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
