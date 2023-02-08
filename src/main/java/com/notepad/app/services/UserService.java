@@ -1,5 +1,6 @@
 package com.notepad.app.services;
 
+import com.notepad.app.exceptions.UserNotFoundException;
 import com.notepad.app.models.User;
 import com.notepad.app.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,5 +19,14 @@ public class UserService {
 
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> {
+                    String msg = String.format("User with email %s not found", email);
+                    return new UserNotFoundException(msg);
+                });
     }
 }

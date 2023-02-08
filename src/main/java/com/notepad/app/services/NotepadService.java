@@ -1,6 +1,7 @@
 package com.notepad.app.services;
 
 import com.notepad.app.models.Note;
+import com.notepad.app.models.User;
 import com.notepad.app.payloads.request.NoteRequest;
 import com.notepad.app.payloads.response.NoteResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,54 +21,66 @@ import java.util.stream.Collectors;
 public class NotepadService {
     private final ModelMapper mapper;
     private final NoteService noteService;
+    private final UserService userService;
 
     @Autowired
-    public NotepadService(ModelMapper mapper, NoteService noteService) {
+    public NotepadService(ModelMapper mapper,
+                          NoteService noteService,
+                          UserService userService) {
         this.mapper = mapper;
         this.noteService = noteService;
+        this.userService = userService;
     }
 
     @Transactional
-    public ResponseEntity<List<NoteResponse>> processNoteSaving(NoteRequest noteRequest) {
+    public ResponseEntity<List<NoteResponse>> processNoteSaving(Principal principal,
+                                                                NoteRequest noteRequest) {
+        log.debug("Saving note with request body ({}) to user with name ({})",
+                principal.getName(), noteRequest);
+
+        User user = userService.findByEmail(principal.getName());
         Note note = mapper.map(noteRequest, Note.class);
-        log.debug("({}) has been mapped to the ({})", noteRequest, note);
-        noteService.saveNote(note);
-        log.debug("({}) is being saved", note);
+        note.setUser(user);
+        note = noteService.saveNote(note);
         List<NoteResponse> notes =
-                mapToListOfNoteResponse(noteService.findAllNotes());
-        log.debug("A list of note responses has been found");
+                mapToListOfNoteResponse(noteService.findAllNotesByUser(note.getUser()));
         return new ResponseEntity<>(notes, HttpStatus.OK);
     }
 
     @Transactional
-    public ResponseEntity<?> processNoteUpdating(Long id, NoteRequest noteRequest) {
-        Note note = noteService.findNoteById(id);
-        log.debug("A note with id ({}) has been found", id);
+    public ResponseEntity<?> processNoteUpdating(Principal principal,
+                                                 Long id, NoteRequest noteRequest) {
+        log.debug("Updating note with id ({}) and request body ({})" +
+                "of a user with name ({})", id, noteRequest, principal.getName());
+
+        User user = userService.findByEmail(principal.getName());
+        Note note = noteService.findNoteByUserAndId(user, id);
         note.setTitle(noteRequest.getTitle());
         note.setContent(noteRequest.getContent());
-        log.debug("Note fields have been updated");
         noteService.saveNote(note);
-        log.debug("({}) has been saved", note);
         List<NoteResponse> noteResponses =
-                mapToListOfNoteResponse(noteService.findAllNotes());
-        log.debug("A list of note responses has been found");
+                mapToListOfNoteResponse(noteService.findAllNotesByUser(user));
         return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 
     @Transactional
-    public ResponseEntity<?> processNoteDeletion(Long id) {
-        noteService.deleteNoteById(id);
-        log.debug("Note with id ({}) has been deleted", id);
+    public ResponseEntity<?> processNoteDeletion(Principal principal, Long id) {
+        log.debug("Deleting note with id ({}) of a user with name ({})",
+                id, principal.getName());
+
+        User user = userService.findByEmail(principal.getName());
+        noteService.deleteNoteByUserAndId(user, id);
         List<NoteResponse> noteResponses =
-                mapToListOfNoteResponse(noteService.findAllNotes());
-        log.debug("A list of note responses has been found");
+                mapToListOfNoteResponse(noteService.findAllNotesByUser(user));
         return new ResponseEntity<>(noteResponses, HttpStatus.NO_CONTENT);
     }
 
-    public ResponseEntity<List<NoteResponse>> processNotesReceiving(String text) {
+    @Transactional
+    public ResponseEntity<List<NoteResponse>> processNotesReceiving(String text,
+                                                                    Principal principal) {
+        User user = userService.findByEmail(principal.getName());
         List<NoteResponse> noteResponses =
-                mapToListOfNoteResponse(noteService.findAllNotesByText(text));
-        log.debug("A list of note responses has been found");
+                mapToListOfNoteResponse(noteService.findAllNotesByUserAndText(user, text));
         return new ResponseEntity<>(noteResponses, HttpStatus.OK);
     }
 

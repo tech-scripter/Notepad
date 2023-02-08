@@ -35,4 +35,7 @@ public class Note {
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     private Date lastModified;
+
+    @ManyToOne
+    private User user;
 }

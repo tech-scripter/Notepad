@@ -11,13 +11,11 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 public class NoteRequest implements Serializable {
-    @NotNull
-    @NotEmpty
-    @NotBlank
+    @NotNull(message = "Title should not be null")
     private final String title;
 
-    @NotEmpty
-    @NotBlank
-    @NotNull
+    @NotEmpty(message = "Content should not be empty")
+    @NotBlank(message = "Content should not be blank")
+    @NotNull(message = "Content should not be null")
     private final String content;
 }

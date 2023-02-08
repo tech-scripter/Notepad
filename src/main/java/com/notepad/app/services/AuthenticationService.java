@@ -19,7 +19,6 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -51,7 +50,7 @@ public class AuthenticationService {
     @Transactional
     public ResponseEntity<?> signUp(UserRequest userRequest) {
         if (userService.existsByEmail(userRequest.getEmail())) {
-            String msg = String.format("Email %s is already exists", userRequest.getEmail());
+            String msg = String.format("Email %s already exists", userRequest.getEmail());
             throw new UserAlreadyExistsException(msg);
         }
         User user = mapper.map(userRequest, User.class);
@@ -62,12 +61,11 @@ public class AuthenticationService {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(UserRequest userRequest) {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(
                         userRequest.getEmail(),
-                        userRequest.getEmail());
+                        userRequest.getPassword());
         Authentication authentication = authenticationProvider.authenticate(token);
         TokenResponse tokenResponse = getToken(authentication);
         return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
