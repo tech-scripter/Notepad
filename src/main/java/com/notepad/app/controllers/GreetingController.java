@@ -16,8 +16,9 @@ public class GreetingController {
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
     public Greeting greeting(@Payload HelloMessage message) throws Exception {
-        log.debug("greeting() got message: " + message);
+        log.debug("greeting() got message: " + message.getName());
         Thread.sleep(1000);
+        log.debug("greeting() got message: " + message.getName());
         return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
     }
 }
