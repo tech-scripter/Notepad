@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class KafkaProducerService {
+public class KafkaProducerService implements BrokerProducerService {
     private final MyService myService;
     private final KafkaTemplate<String, Source> kafkaTemplate;
 
@@ -17,8 +17,9 @@ public class KafkaProducerService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
+    @Override
     @Scheduled(fixedRate = 60000)
-    public void sendMessage() {
+    public void produce() {
         Source source = myService.getSource();
         kafkaTemplate.send("news", source);
     }

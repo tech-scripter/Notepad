@@ -36,6 +36,6 @@ public class Note {
     @UpdateTimestamp
     private Date lastModified;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }
