@@ -1,46 +1,41 @@
 package com.notepad.app.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
-@Table(name = "notes")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "NOTES")
 public class Note {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "ID_GENERATOR")
     private Long id;
 
-    @Column(name = "title",
+    @Column(name = "TITLE",
             nullable = false)
     private String title;
 
-    @Column(name = "content",
-            nullable = false)
+    @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "created_at",
-            nullable = false)
-    @JsonIgnore
-    private LocalDateTime createdAt;
+    @Column(name = "CREATED_AT",
+            updatable = false)
+    @CreationTimestamp
+    private Date createdAt;
 
-    @ManyToOne
-    @JoinColumn(nullable = false,
-                name = "user_id")
+    @Column(name = "LAST_MODIFIED", insertable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    private Date lastModified;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
-
-    public Note(String title, String content, LocalDateTime createdAt, User user) {
-        this.title = title;
-        this.content = content;
-        this.createdAt = createdAt;
-        this.user = user;
-    }
 }

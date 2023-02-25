@@ -1,92 +1,94 @@
 package com.notepad.app.services;
 
-import com.notepad.app.payloads.ModifiedNote;
+import com.notepad.app.exceptions.NoteNotFoundException;
 import com.notepad.app.models.Note;
 import com.notepad.app.models.User;
 import com.notepad.app.repositories.NoteRepository;
-import com.notepad.app.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @Service
 public class NoteService {
-
-    private final UserRepository userRepository;
     private final NoteRepository noteRepository;
 
     @Autowired
-    public NoteService(UserRepository userRepository,
-                       NoteRepository noteRepository) {
-        this.userRepository = userRepository;
+    public NoteService(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
     }
 
-    public ResponseEntity<?> create(Note note) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            noteRepository.save(new Note(note.getTitle(),
-                    note.getContent(),
-                    LocalDateTime.now(),
-                    user.get()));
-            return new ResponseEntity<>("Заметка создана!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public Note saveNote(Note note) {
+        log.info("Note {} saved", note);
+        return noteRepository.save(note);
     }
 
-    public ResponseEntity<?> delete(String title) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            noteRepository.deleteByTitle(title);
-            return new ResponseEntity<>("Заметка удалена!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public List<Note> findAllNotesByUserAndText(User user, String text) {
+        log.info("Notes have been found by text ({})", text);
+        return noteRepository.findAllByUserAndTextInTitleOrContent(user, text);
     }
 
-    public ResponseEntity<?> update(String id, ModifiedNote modifiedNote) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            noteRepository.updateNoteById(Long.parseLong(id),
-                    modifiedNote.getTitle(),
-                    modifiedNote.getContent(),
-                    LocalDateTime.now(),
-                    user.get());
-            return new ResponseEntity<>("Заметка изменена!", HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public Note findNoteById(Long id) {
+        return noteRepository
+                .findById(id)
+                .orElseThrow(() -> {
+                    RuntimeException e = new NoteNotFoundException(getMsgNoteNotFoundBy(id));
+                    log.error("Exception has been thrown: {}", e.getMessage());
+                    return e;
+                });
     }
 
-    public ResponseEntity<?> displayAllNotesById(String id) {
-        Optional<User> user = getCurrentUser();
-
-        if (user.isPresent()) {
-            List<Note> userNotesById = noteRepository.findAllNotesByUserId(Long.parseLong(id));
-            return new ResponseEntity<>(userNotesById, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>("Время сессии истекло! Пожалуйста, войдите снова.",
-                HttpStatus.UNAUTHORIZED);
+    public Note findNoteByUserAndId(User user, Long id) {
+        return noteRepository
+                .findByUserAndId(user, id)
+                .orElseThrow(() -> {
+                    RuntimeException e = new NoteNotFoundException(getMsgNoteNotFoundBy(user, id));
+                    log.error("Exception has been thrown: {}", e.getMessage());
+                    return e;
+                });
     }
 
-    private Optional<User> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String name = authentication.getName();
-        return userRepository.findByUsername(name);
+    public List<Note> findAllNotes() {
+        log.info("Notes have been found");
+        return noteRepository.findAll();
+    }
+
+    public List<Note> findAllNotesByUser(User user) {
+        log.info("Notes by user id ({}) have been found", user.getId());
+        return noteRepository.findAllByUser(user);
+    }
+
+    public void deleteNoteById(Long id) {
+        log.debug("Deleting note with id ({})", id);
+        if (noteRepository.existsById(id)) {
+            noteRepository.deleteById(id);
+        } else {
+            RuntimeException e = new NoteNotFoundException(getMsgNoteNotFoundBy(id));
+            log.error("Exception has been thrown: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    public void deleteNoteByUserAndId(User user, Long id) {
+        log.debug("Deleting note with id ({}) of a user with name ({})",
+                id, user.getUsername());
+        if (noteRepository.existsByUserAndId(user, id)) {
+            noteRepository.deleteByUserAndId(user, id);
+        } else {
+            RuntimeException e = new NoteNotFoundException(getMsgNoteNotFoundBy(user, id));
+            log.error("Exception has been thrown: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    private String getMsgNoteNotFoundBy(Long id) {
+        return String.format("Note with id %d not found", id);
+    }
+
+    private String getMsgNoteNotFoundBy(User user, Long id) {
+        return String.format("Note with id (%d) and user id (%d) not found",
+                id, user.getId());
     }
 }

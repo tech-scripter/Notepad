@@ -1,0 +1,15 @@
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .authorizeHttpRequests((authorize) -> authorize
+//                        .antMatchers("/admin").hasRole("ADMIN")
+//                        .antMatchers("/sign-up", "/sign-in", "/error").permitAll()
+//                        .anyRequest().authenticated())
+//                .csrf((csrf) -> csrf.ignoringAntMatchers("/sign-in"))
+//                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+//                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .exceptionHandling((exceptions) -> exceptions
+//                        .authenticationEntryPoint(authenticationEntryPoint())
+//                        .accessDeniedHandler(accessDeniedHandler()));
+//        return http.build();
+//    }
