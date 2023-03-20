@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration
 @ConfigurationProperties("app.config.auth")
-public class AppConfig {
+public class ApplicationConfig {
     private String username;
     private String token;
 }

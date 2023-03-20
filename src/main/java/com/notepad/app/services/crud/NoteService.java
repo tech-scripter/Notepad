@@ -1,4 +1,4 @@
-package com.notepad.app.services;
+package com.notepad.app.services.crud;
 
 import com.notepad.app.exceptions.NoteNotFoundException;
 import com.notepad.app.models.Note;
@@ -88,7 +88,6 @@ public class NoteService {
     }
 
     private String getMsgNoteNotFoundBy(User user, Long id) {
-        return String.format("Note with id (%d) and user id (%d) not found",
-                id, user.getId());
+        return String.format("Note with id (%d) and user id (%d) not found", id, user.getId());
     }
 }

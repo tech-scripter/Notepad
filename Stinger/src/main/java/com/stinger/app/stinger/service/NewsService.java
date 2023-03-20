@@ -1,6 +1,6 @@
 package com.stinger.app.stinger.service;
 
-import com.stinger.app.stinger.exceptions.SourcesNotFoundException;
+import com.stinger.app.stinger.exceptions.SourceNotFoundException;
 import com.stinger.app.stinger.models.SourcesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +18,6 @@ public class NewsService {
     private String language;
     @Value("${news-api-client.sources.request.parameter.country}")
     private String country;
-
-
-
     private final RestTemplate restTemplate;
 
     @Autowired
@@ -33,7 +30,7 @@ public class NewsService {
         SourcesResponse response = restTemplate.getForObject(url, SourcesResponse.class);
 
         if (response == null) {
-            throw new SourcesNotFoundException("Sources not found");
+            throw new SourceNotFoundException("Sources not found");
         }
 
         return response;

@@ -1,4 +1,4 @@
-package com.notepad.app.services;
+package com.notepad.app.services.auth;
 
 import com.notepad.app.exceptions.UserNotFoundException;
 import com.notepad.app.models.User;

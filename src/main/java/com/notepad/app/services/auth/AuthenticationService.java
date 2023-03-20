@@ -1,4 +1,4 @@
-package com.notepad.app.services;
+package com.notepad.app.services.auth;
 
 import com.notepad.app.exceptions.UserAlreadyExistsException;
 import com.notepad.app.models.Role;
@@ -6,8 +6,8 @@ import com.notepad.app.models.User;
 import com.notepad.app.payloads.request.UserRequest;
 import com.notepad.app.payloads.response.TokenResponse;
 import com.notepad.app.payloads.response.UserResponse;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -25,27 +25,14 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
     private static final Role defaultRole = Role.USER;
-
     private final JwtEncoder encoder;
     private final ModelMapper mapper;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
-
-    @Autowired
-    public AuthenticationService(JwtEncoder encoder,
-                                 ModelMapper mapper,
-                                 UserService userService,
-                                 PasswordEncoder passwordEncoder,
-                                 AuthenticationProvider authenticationProvider) {
-        this.encoder = encoder;
-        this.mapper = mapper;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationProvider = authenticationProvider;
-    }
 
     @Transactional
     public ResponseEntity<?> signUp(UserRequest userRequest) {

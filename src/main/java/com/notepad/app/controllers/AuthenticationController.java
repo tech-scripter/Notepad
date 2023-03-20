@@ -2,7 +2,7 @@ package com.notepad.app.controllers;
 
 import com.notepad.app.exceptions.RequestValidationException;
 import com.notepad.app.payloads.request.UserRequest;
-import com.notepad.app.services.AuthenticationService;
+import com.notepad.app.services.auth.AuthenticationService;
 import com.notepad.app.utils.ValidationErrorGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ public class AuthenticationController {
 
     private void checkValidationRequestErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String msg = ValidationErrorGenerator.getMessage(bindingResult);
+            String msg = ValidationErrorGenerator.generate(bindingResult);
             throw new RequestValidationException(msg);
         }
     }

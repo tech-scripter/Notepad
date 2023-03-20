@@ -1,12 +1,13 @@
-package com.notepad.app.services;
+package com.notepad.app.services.crud;
 
 import com.notepad.app.models.Note;
 import com.notepad.app.models.User;
 import com.notepad.app.payloads.request.NoteRequest;
 import com.notepad.app.payloads.response.NoteResponse;
+import com.notepad.app.services.auth.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotepadService {
     private final ModelMapper mapper;
     private final NoteService noteService;
     private final UserService userService;
-
-    @Autowired
-    public NotepadService(ModelMapper mapper,
-                          NoteService noteService,
-                          UserService userService) {
-        this.mapper = mapper;
-        this.noteService = noteService;
-        this.userService = userService;
-    }
 
     @Transactional
     public ResponseEntity<List<NoteResponse>> processNoteSaving(Principal principal,

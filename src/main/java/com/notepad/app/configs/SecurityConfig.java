@@ -8,7 +8,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.notepad.app.security.BearerTokenAccessDeniedHandler;
 import com.notepad.app.security.BearerTokenAuthenticationEntryPoint;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +34,7 @@ import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
@@ -45,22 +46,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final BearerTokenAccessDeniedHandler accessDeniedHandler;
     private final BearerTokenAuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService,
-                          BearerTokenAccessDeniedHandler accessDeniedHandler,
-                          BearerTokenAuthenticationEntryPoint authenticationEntryPoint) {
-        this.userDetailsService = userDetailsService;
-        this.accessDeniedHandler = accessDeniedHandler;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
                 .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/sign-up", "/sign-in", "/error",
-                        "/hello", "/", "/gs-guide-websocket/**").permitAll()
+                        "/hello", "/", "/gs-guide-websocket/**", "/posts/**",
+                        "/employees/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .csrf().disable()

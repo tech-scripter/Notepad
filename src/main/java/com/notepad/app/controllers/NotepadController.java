@@ -3,7 +3,7 @@ package com.notepad.app.controllers;
 import com.notepad.app.exceptions.RequestValidationException;
 import com.notepad.app.payloads.request.NoteRequest;
 import com.notepad.app.payloads.response.NoteResponse;
-import com.notepad.app.services.NotepadService;
+import com.notepad.app.services.crud.NotepadService;
 import com.notepad.app.utils.ValidationErrorGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class NotepadController {
 
     private void checkValidationRequestErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String msg = ValidationErrorGenerator.getMessage(bindingResult);
+            String msg = ValidationErrorGenerator.generate(bindingResult);
             throw new RequestValidationException(msg);
         }
     }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class ValidationErrorGenerator {
 
-    public static String getMessage(BindingResult bindingResult) {
+    public static String generate(BindingResult bindingResult) {
         return bindingResult.getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)

@@ -1,6 +1,6 @@
 package com.notepad.app.services;
 
-import com.notepad.app.configs.AppConfig;
+import com.notepad.app.configs.ApplicationConfig;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,10 @@ import javax.annotation.PostConstruct;
 @Service
 @AllArgsConstructor
 public class AppService {
-    private final AppConfig appConfig;
+    private final ApplicationConfig applicationConfig;
 
     @PostConstruct
     public void readConfigs() {
-        log.info("Reading configuration {} - {}", appConfig.getToken(), appConfig.getUsername());
+        log.info("Reading configuration {} - {}", applicationConfig.getToken(), applicationConfig.getUsername());
     }
 }
